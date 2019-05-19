@@ -1,0 +1,7 @@
+# Module name.
+name: Remove Head Link
+description: 'Module for unset any wrong HTML links (like rel=delete-form, rel=edit-form, etc.) from head on Drupal 8.x websites. This is trust way to grow up position in SERP Google, Yandex, etc.'
+core: 8.x
+type: module
+package: Authint Media
+version: 8.x-1.0

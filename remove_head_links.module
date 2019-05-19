@@ -1,0 +1,68 @@
+<?php
+
+use Drupal\Core\Entity\Display\EntityViewDisplayInterface;
+use Drupal\Core\Entity\EntityInterface;
+use Drupal\node\NodeInterface;
+
+/**
+ * Implements hook_entity_view_alter().
+ * @param array $build
+ * @param EntityInterface $entity
+ * @param EntityViewDisplayInterface $display
+ */
+function remove_head_links_entity_view_alter(array &$build, EntityInterface $entity, EntityViewDisplayInterface $display) {
+  // Cheking view_mode for node.
+  if ($build['#view_mode'] !== 'full' && $entity Instanceof NodeInterface) {
+    return;
+  }
+  _remove_header_links($build);
+}
+
+/**
+ * Implements hook_page_attachments_alter().
+ * @param array $attachments
+ */
+function remove_head_links_page_attachments_alter(array &$attachments) {
+  _remove_header_links($attachments);
+}
+
+function _remove_header_links(array &$attachments) {
+  // Cheking html_head_link on attached tags in head.
+  if (!isset($attachments['#attached']['html_head_link'])) {
+    return;
+  }
+  // Array to unset.
+  $remove_head_links = [
+    'delete-form',
+    'edit-form',
+    'version-history',
+    'revision',
+    'display',
+    'drupal:content-translation-overview',
+    'drupal:content-translation-add',
+    'drupal:content-translation-edit',
+    'drupal:content-translation-delete',
+    'shortlink',
+    'canonical',
+    'forum-edit-container-form',
+    'forum-delete-form',
+    'forum-edit-form'
+  ];
+  // Unset loop.
+  foreach ($attachments['#attached']['html_head_link'] as $key => $value) {
+    if (isset($value[0]['rel']) && in_array($value[0]['rel'], $remove_head_links)) {
+      unset($attachments['#attached']['html_head_link'][$key]);
+    }
+  }
+}
+
+/**
+ * Implements hook_module_implements_alter().
+ */
+function remove_head_links_module_implements_alter(&$implementations, $hook) {
+  if ($hook === 'page_attachments_alter') {
+    $group = $implementations['remove_head_links'];
+    unset($implementations['remove_head_links']);
+    $implementations['remove_head_links'] = $group;
+  }
+}
